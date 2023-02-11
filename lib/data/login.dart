@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_api_projext/data/kakao_main.dart';
 import 'package:flutter_api_projext/data/kakao_view.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart' as kakao;
@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage>
   Animation? _animation;
   kakao.User? user;
   final viewModel = KakaoView(KakaoMain());
-
+  bool isLogined = false;
   bool visible = false;
 
   Future<dynamic> loginkakao() async {
@@ -30,11 +30,37 @@ class _LoginPageState extends State<LoginPage>
     try {
       if (viewModel.isLogined) {
         if (!mounted) return;
-        Navigator.of(context).pushReplacementNamed('/main');
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/main',
+          (route) => false,
+        );
       } else {}
     } catch (e) {
       debugPrint('에러입니다:$e');
     }
+  }
+
+  // final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  Future<UserCredential> signInWithGoogle() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    print('확인용1 : $googleUser');
+    if (googleUser != null) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/main',
+        (route) => false,
+      );
+    }
+
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+    print('확인용2 : $googleAuth');
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+    print('확인용3 : $credential');
+    return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
   @override
@@ -86,7 +112,7 @@ class _LoginPageState extends State<LoginPage>
                     },
                     child: const Icon(
                       Icons.airplanemode_active,
-                      color: Colors.deepOrangeAccent,
+                      color: Colors.indigo,
                       size: 80,
                     ),
                   ),
@@ -97,7 +123,7 @@ class _LoginPageState extends State<LoginPage>
                       height: 100,
                       child: Center(
                         child: Text(
-                          '모두의 여행',
+                          '여행 가자(서울편)',
                           style: TextStyle(
                             fontSize: 30,
                           ),
@@ -130,11 +156,25 @@ class _LoginPageState extends State<LoginPage>
                                 ),
                               ),
                               const SizedBox(
-                                height: 10,
+                                height: 20,
                               ),
-                              Visibility(
-                                visible: visible,
-                                child: const CircularProgressIndicator(),
+                              ElevatedButton(
+                                onPressed: () {
+                                  signInWithGoogle();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  padding: EdgeInsets.zero,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Image.asset(
+                                      'images/googlelogin.png',
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           );

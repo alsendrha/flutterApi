@@ -51,6 +51,7 @@ dependencies:
   firebase_auth: ^4.2.5
   kakao_flutter_sdk_user:
   google_sign_in: ^5.4.4
+  fluttertoast: ^8.1.3
 
 dev_dependencies:
   flutter_test:
@@ -77,7 +78,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - images/
-  #   - images/a_dot_ham.jpeg
+    - images/googlelogin.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

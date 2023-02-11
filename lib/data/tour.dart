@@ -15,12 +15,10 @@ class TourData {
     required this.tel,
     required this.zipcode,
     required this.address,
-    required this.address2,
-    required this.id,
+    this.address2,
     required this.mapx,
     required this.mapy,
     required this.imagePath,
-    required this.imagePath2,
   });
 
   TourData.fromJson(Map data)

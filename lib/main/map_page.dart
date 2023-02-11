@@ -58,17 +58,6 @@ class _MapPageState extends State<MapPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('검색하기'),
-          actions: [
-            IconButton(
-              onPressed: () async {
-                await viewModel.logout();
-                Navigator.of(context).pushReplacementNamed('/');
-              },
-              icon: const Icon(
-                Icons.logout,
-              ),
-            ),
-          ],
         ),
         body: Container(
           child: Center(
@@ -194,6 +183,9 @@ class _MapPageState extends State<MapPage> {
                             );
                             print('타이틀 : ${tourData[index].title} 노데이터 클릭중이야');
                           },
+                          onDoubleTap: () {
+                            insertTour(widget.db!, tourData[index]);
+                          },
                         ),
                       );
                     },
@@ -206,6 +198,19 @@ class _MapPageState extends State<MapPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void insertTour(Future<Database> db, TourData info) async {
+    final Database database = await db;
+    await database
+        .insert('place2', info.toMap(),
+            conflictAlgorithm: ConflictAlgorithm.replace)
+        .then(
+      (value) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('즐겨찾기에 추가되었습니다')));
+      },
     );
   }
 
@@ -231,6 +236,7 @@ class _MapPageState extends State<MapPage> {
     var json = jsonDecode(body);
     if (json['response']['header']['resultCode'] == '0000') {
       if (json['response']['body']['items'] == '') {
+        if (!mounted) return;
         showDialog(
           context: context,
           builder: (context) {
@@ -242,9 +248,11 @@ class _MapPageState extends State<MapPage> {
       } else {
         List jsonArray = json['response']['body']['items']['item'];
         for (var s in jsonArray) {
-          setState(() {
-            tourData.add(TourData.fromJson(s));
-          });
+          if (mounted) {
+            setState(() {
+              tourData.add(TourData.fromJson(s));
+            });
+          }
         }
       }
     } else {
