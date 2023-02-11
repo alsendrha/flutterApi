@@ -193,8 +193,8 @@ class Kind {
     );
     kinds.add(
       DropdownMenuItem(
-        value: Item('캠핑장?', 28),
-        child: const Text('캠핑장?'),
+        value: Item('캠핑장', 28),
+        child: const Text('캠핑장'),
       ),
     );
     kinds.add(
